@@ -1,0 +1,36 @@
+pipeline {
+    agent {
+        node {
+            label 'test_agent_py'
+        }
+    }
+    options {
+        timestamps()
+    }
+    stages {
+        stage ('Build') {
+            steps {
+                sh 'echo "HELLO WORLD"'
+            }
+        }
+        stage ('UNIX CMD') {
+            steps{
+                sh """
+                whoami
+                ls -lah
+                """
+            }
+        }
+        stage ('Test') {
+            steps {
+                script {
+                    // The below will clone your repo and will be checked out to master branch by default.
+                    git credentialsId: 'git-live-2-code', url: 'git@github.com:live-2-code/dummy.git', branch: 'main'
+                    // Do a ls -lart to view all the files are cloned. It will be clonned. This is just for you to be sure about it.
+                    sh "ls -lart ./*" 
+                    sh "python3 testing.py"
+                }
+            }
+        }
+    }
+}
